@@ -7,6 +7,5 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class NexusApplication {
     public static void main(String[] args) {
         SpringApplication.run(NexusApplication.class, args);
-        short
     }
 }
