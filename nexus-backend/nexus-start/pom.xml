@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>com.nexus</groupId>
+        <artifactId>nexus-backend</artifactId>
+        <version>1.0.0</version>
+    </parent>
+    
+    <artifactId>nexus-start</artifactId>
+    <name>nexus-start</name>
+    <description>Nexus Start - 启动模块</description>
+    
+    <dependencies>
+        <!-- 内部模块依赖 -->
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-infrastructure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-module-system</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-module-knowledge</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-module-rag</artifactId>
+        </dependency>
+        
+        <!-- Spring Boot Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        
+        <!-- Spring Boot Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.nexus.NexusApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
