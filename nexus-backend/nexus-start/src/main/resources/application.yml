@@ -1,8 +1,12 @@
 server:
   port: 8080
+  servlet:
+    context-path: /api
 
 spring:
-  application:
-    name: nexus-backend
-  profiles:
-    active: dev
+  # MySQL 配置 (保持不变)
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/nexus_brain?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: 123456 # 你的密码
