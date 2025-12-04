@@ -116,6 +116,7 @@ public class Result<T> {
      * 失败响应 
      * @param resultCode 响应状态码枚举
      * @param message 消息
+     * @param <T> 数据类型
      * @return Result<T>
      */
     public static <T> Result<T> success(ResultCode resultCode,String message) {
