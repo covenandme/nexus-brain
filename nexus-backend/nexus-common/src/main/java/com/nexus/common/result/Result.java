@@ -63,8 +63,8 @@ public class Result<T> {
 
     /**
      * 成功响应 
-     * @param data 数据
      * @param resultCode 响应状态码枚举
+     * @param data 数据
      * @param <T> 数据类型
      * @return Result<T>
      */
@@ -119,7 +119,7 @@ public class Result<T> {
      * @param <T> 数据类型
      * @return Result<T>
      */
-    public static <T> Result<T> success(ResultCode resultCode,String message) {
+    public static <T> Result<T> error(ResultCode resultCode,String message) {
         return new Result<>(resultCode.getCode(), message, null);
     }
  
