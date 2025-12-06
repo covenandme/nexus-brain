@@ -20,7 +20,6 @@
     
     <properties>
         <java.version>17</java.version>
-        <spring-ai.version>0.8.1</spring-ai.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <hutool.version>5.8.26</hutool.version>
         <lombok.version>1.18.30</lombok.version>
@@ -39,29 +38,18 @@
         <module>nexus-start</module>
     </modules>
     
-    <repositories>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    
     <dependencyManagement>
         <dependencies>
-            <!-- Spring AI -->
-            <dependency>
-                <groupId>org.springframework.ai</groupId>
-                <artifactId>spring-ai-bom</artifactId>
-                <version>${spring-ai.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             
             <!-- MyBatis Plus -->
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>3.0.3</version> </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>3.5.11</version> </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
