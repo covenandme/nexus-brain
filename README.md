@@ -53,19 +53,3 @@
 
 ## 🔄 核心业务流转 (Core Workflows)
 
-### 1. 写入链路：文档上传与解析 (Write Path)
-用户上传文档到指定团队群组，系统异步处理解析与向量化。
-
-```mermaid
-sequenceDiagram
-    participant User as 用户
-    participant API as Nexus-Start (Knowledge)
-    participant MinIO as MinIO存储
-    participant DB as MySQL
-    participant MQ as RabbitMQ
-    
-    User->>API: 上传文档 (PDF/Word)
-    API->>MinIO: 1. 存储原始文件
-    API->>DB: 2. 记录文件元数据 (状态: 待解析)
-    API->>MQ: 3. 发送解析消息 (DocId)
-    API-->>User: 4. 返回 "上传成功" (异步处理)
