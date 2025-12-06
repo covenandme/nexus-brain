@@ -1,0 +1,39 @@
+name: NexusBrain CI Build
+
+on:
+  push:
+    branches: [ master ]  # 当推送到 main 分支时触发
+  pull_request:
+    branches: [ master ]  # 当有 PR 提交到 main 分支时触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 缓存 Maven 依赖，加快后续构建速度
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    # 设置 Java 17 环境
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'maven' # 启用 Maven 缓存
+
+    # 编译和运行单元测试
+    # -DskipTests=true 会跳过所有测试，但我们应该只跳过集成测试 (ITs)
+    - name: Build and run Unit Tests
+      run: mvn clean install -DskipITs=true
+      working-directory: ./nexus-backend/
+    # TODO: 🚨 注意：如果你的单元测试需要连接数据库，此处仍会失败。
+    # -DskipITs=true 告诉 Maven 跳过集成测试，只运行单元测试。
