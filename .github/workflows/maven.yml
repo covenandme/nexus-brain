@@ -34,6 +34,6 @@ jobs:
     # -DskipTests=true 会跳过所有测试，但我们应该只跳过集成测试 (ITs)
     - name: Build and run Unit Tests
       run: mvn clean install -DskipITs=true
-      
+      working-directory: ./nexus-backend/
     # TODO: 🚨 注意：如果你的单元测试需要连接数据库，此处仍会失败。
     # -DskipITs=true 告诉 Maven 跳过集成测试，只运行单元测试。
