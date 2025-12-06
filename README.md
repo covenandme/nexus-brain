@@ -5,7 +5,7 @@
 [![Spring AI](https://img.shields.io/badge/Spring%20AI-0.8.x-blue)](https://spring.io/projects/spring-ai)
 [![Architecture](https://img.shields.io/badge/Architecture-Modular%20Monolith-purple)](https://github.com/YourUsername/NexusBrain)
 
-> **NexusBrain** 是一个基于 **模块化单体 (Modular Monolith)** 架构的企业级知识库系统。它摒弃了传统的 SaaS 租户模式，采用更灵活的 **“团队/群组 (Team-based)”** 协作模型，结合 **RAG (检索增强生成)** 技术，允许用户在私有群或协作群中上传文档，并与 AI 进行基于文档的智能对话。
+> **NexusBrain** 是一个基于 **模块化单体 (Modular Monolith)** 架构的企业级知识库系统。采用灵活的 **“团队/群组 (Team-based)”** 协作模型，结合 **RAG (检索增强生成)** 技术，允许用户在私有群或协作群中上传文档，并与 AI 进行基于文档的智能对话。（用AI从0到1开发中！！！！！！！！！）
 
 ---
 
