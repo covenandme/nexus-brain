@@ -3,6 +3,7 @@ package com.nexus.common.exception;
 import com.nexus.common.result.Result;
 import com.nexus.common.result.ResultCode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -39,6 +40,17 @@ public class GlobalExceptionHandler {
     public Result<Object> handleBusinessException(BusinessException e) {
         log.error("业务异常：{}", e.getMessage());
         return Result.error(e.getCode(), e.getMessage());
+    }
+    
+    /**
+     * 处理访问拒绝异常
+     * @param e 访问拒绝异常
+     * @return Result
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public Result<Object> handleAccessDeniedException(AccessDeniedException e) {
+        log.error("访问拒绝：{}", e.getMessage());
+        return Result.error(ResultCode.FORBIDDEN);
     }
     
     /**
