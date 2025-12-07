@@ -17,9 +17,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     
     @Override
     public Role getByCode(String code) {
+        // MyBatis-Plus 的 @TableLogic 会自动过滤已删除的记录，无需手动判断 deleted
         LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Role::getCode, code);
-        wrapper.eq(Role::getDeleted, 0);
         Role role = this.getOne(wrapper);
         if (role == null) {
             throw new BusinessException(ResultCode.NOTFOUND, "角色不存在: " + code);
