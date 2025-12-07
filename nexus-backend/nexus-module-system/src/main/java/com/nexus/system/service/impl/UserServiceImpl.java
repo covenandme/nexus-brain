@@ -150,45 +150,45 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ResultCode.VALIDATE_FAILED, "用户ID不能为空");
         }
 
-        Long userId = Long.valueOf(id.toString());
-        
-        // 检查用户是否存在
+        // 安全转型 ID
+        Long userId = (Long) id;
+
+        // 1. 检查用户是否存在
         User user = this.getById(userId);
         if (user == null) {
             throw new BusinessException(ResultCode.NOTFOUND, "用户不存在");
         }
 
-        // 步骤1: 删除用户的所有私有团队（个人空间）
-        LambdaQueryWrapper<Team> teamWrapper = new LambdaQueryWrapper<>();
-        teamWrapper.eq(Team::getOwnerId, userId);
-        teamWrapper.eq(Team::getType, TEAM_TYPE_PRIVATE);
-        teamWrapper.eq(Team::getDeleted, 0);
-        java.util.List<Team> privateTeams = teamService.list(teamWrapper);
+        // --- 步骤 1: 删除该用户拥有的所有私有团队及其成员 ---
 
-        for (Team team : privateTeams) {
-            // 删除该团队的所有成员关联
-            LambdaQueryWrapper<TeamMember> memberWrapper = new LambdaQueryWrapper<>();
-            memberWrapper.eq(TeamMember::getTeamId, team.getId());
-            memberWrapper.eq(TeamMember::getDeleted, 0);
-            teamMemberService.remove(memberWrapper);
+        // 找出所有该用户拥有的私有团队 ID (Team Type = 1)
+        LambdaQueryWrapper<Team> privateTeamQuery = new LambdaQueryWrapper<>();
+        privateTeamQuery.eq(Team::getOwnerId, userId)
+                .eq(Team::getType, 1) // 假设 1 为私有团队常量
+                .select(Team::getId); // 仅查询 ID，提高效率
 
-            // 删除团队本身
-            teamService.removeById(team.getId());
+        java.util.List<Long> privateTeamIds = teamService.listObjs(privateTeamQuery, obj -> (Long) obj);
+
+        if (!privateTeamIds.isEmpty()) {
+            // A. 批量删除这些私有群的所有成员记录 (更高效)
+            LambdaQueryWrapper<TeamMember> privateTeamMemberWrapper = new LambdaQueryWrapper<>();
+            privateTeamMemberWrapper.in(TeamMember::getTeamId, privateTeamIds);
+            teamMemberService.remove(privateTeamMemberWrapper);
+            // B. 批量删除私有群主体
+            teamService.removeByIds(privateTeamIds);
         }
 
-        // 步骤2: 删除用户的所有团队关联（包括在其他团队中的成员关系）
+        // --- 步骤 2: 删除用户在所有团队中的成员关联 (包括协作群) ---
         LambdaQueryWrapper<TeamMember> userTeamWrapper = new LambdaQueryWrapper<>();
         userTeamWrapper.eq(TeamMember::getUserId, userId);
-        userTeamWrapper.eq(TeamMember::getDeleted, 0);
         teamMemberService.remove(userTeamWrapper);
 
-        // 步骤3: 删除用户的所有角色关联
+        // --- 步骤 3: 删除用户的所有全局角色关联 (RBAC) ---
         LambdaQueryWrapper<UserRole> userRoleWrapper = new LambdaQueryWrapper<>();
         userRoleWrapper.eq(UserRole::getUserId, userId);
-        userRoleWrapper.eq(UserRole::getDeleted, 0);
         userRoleService.remove(userRoleWrapper);
 
-        // 步骤4: 最后删除用户本身
+        // --- 步骤 4: 最后删除用户主体 ---
         return super.removeById(userId);
     }
 }
