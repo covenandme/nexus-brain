@@ -38,9 +38,9 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         }
         
         // 步骤1: 删除团队的所有成员关联
+        // MyBatis-Plus 的 @TableLogic 会自动过滤已删除的记录，无需手动判断 deleted
         LambdaQueryWrapper<TeamMember> memberWrapper = new LambdaQueryWrapper<>();
         memberWrapper.eq(TeamMember::getTeamId, teamId);
-        memberWrapper.eq(TeamMember::getDeleted, 0);
         teamMemberService.remove(memberWrapper);
         
         // 步骤2: 删除团队本身

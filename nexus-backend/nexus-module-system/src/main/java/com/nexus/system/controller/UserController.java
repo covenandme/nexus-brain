@@ -3,8 +3,10 @@ package com.nexus.system.controller;
 import com.nexus.common.result.PageResult;
 import com.nexus.common.result.Result;
 import com.nexus.system.dto.UserDto;
+import com.nexus.system.dto.UserLoginDTO;
 import com.nexus.system.dto.UserRegisterDTO;
 import com.nexus.system.service.UserService;
+import com.nexus.system.controller.vo.LoginResultVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +24,16 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    /**
+     * 用户登录
+     */
+    @Operation(summary = "用户登录", description = "用户登录，返回JWT Token和用户信息")
+    @PostMapping("/login")
+    public Result<LoginResultVO> login(@Valid @RequestBody UserLoginDTO userLoginDTO) {
+        LoginResultVO result = userService.login(userLoginDTO);
+        return Result.success(result);
+    }
 
     /**
      * 用户注册

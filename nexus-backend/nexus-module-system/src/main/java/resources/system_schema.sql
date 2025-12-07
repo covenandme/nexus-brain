@@ -8,9 +8,9 @@ CREATE TABLE `sys_user` (
                             `email` varchar(100) DEFAULT NULL COMMENT '邮箱',
                             `create_time` datetime DEFAULT NULL,
                             `update_time` datetime DEFAULT NULL,
-                            `deleted` tinyint DEFAULT 0,
+                            `deleted` bigint DEFAULT 0 COMMENT '删除标记（0-未删除，删除时设置为当前记录的id值）',
                             PRIMARY KEY (`id`),
-                            UNIQUE KEY `uk_username` (`username`)
+                            UNIQUE KEY `uk_username_deleted` (`username`, `deleted`)
 ) COMMENT='系统用户表';
 
 -- 2. 角色表 (新增)
@@ -22,9 +22,9 @@ CREATE TABLE `sys_role` (
                             `description` varchar(100) DEFAULT NULL COMMENT '描述',
                             `create_time` datetime DEFAULT NULL,
                             `update_time` datetime DEFAULT NULL,
-                            `deleted` tinyint DEFAULT 0,
+                            `deleted` bigint DEFAULT 0 COMMENT '删除标记（0-未删除，删除时设置为当前记录的id值）',
                             PRIMARY KEY (`id`),
-                            UNIQUE KEY `uk_code` (`code`)
+                            UNIQUE KEY `uk_code_deleted` (`code`, `deleted`)
 ) COMMENT='系统角色表';
 
 -- 3. 权限表 (新增)
@@ -35,9 +35,9 @@ CREATE TABLE `sys_permission` (
                                   `code` varchar(50) NOT NULL COMMENT '权限标识 (如: team:create)',
                                   `create_time` datetime DEFAULT NULL,
                                   `update_time` datetime DEFAULT NULL,
-                                  `deleted` tinyint DEFAULT 0,
+                                  `deleted` bigint DEFAULT 0 COMMENT '删除标记（0-未删除，删除时设置为当前记录的id值）',
                                   PRIMARY KEY (`id`),
-                                  UNIQUE KEY `uk_code` (`code`)
+                                  UNIQUE KEY `uk_code_deleted` (`code`, `deleted`)
 ) COMMENT='系统权限表';
 
 -- 4. 用户-角色关联表 (新增)
@@ -47,8 +47,10 @@ CREATE TABLE `sys_user_role` (
                                  `user_id` bigint NOT NULL COMMENT '用户ID',
                                  `role_id` bigint NOT NULL COMMENT '角色ID',
                                  `create_time` datetime DEFAULT NULL,
+                                 `update_time` datetime DEFAULT NULL,
+                                 `deleted` bigint DEFAULT 0 COMMENT '删除标记（0-未删除，删除时设置为当前记录的id值）',
                                  PRIMARY KEY (`id`),
-                                 UNIQUE KEY `uk_user_role` (`user_id`, `role_id`)
+                                 UNIQUE KEY `uk_user_role_deleted` (`user_id`, `role_id`, `deleted`)
 ) COMMENT='用户-角色关联表';
 
 -- 5. 角色-权限关联表 (新增)
@@ -58,8 +60,10 @@ CREATE TABLE `sys_role_permission` (
                                        `role_id` bigint NOT NULL COMMENT '角色ID',
                                        `permission_id` bigint NOT NULL COMMENT '权限ID',
                                        `create_time` datetime DEFAULT NULL,
+                                       `update_time` datetime DEFAULT NULL,
+                                       `deleted` bigint DEFAULT 0 COMMENT '删除标记（0-未删除，删除时设置为当前记录的id值）',
                                        PRIMARY KEY (`id`),
-                                       UNIQUE KEY `uk_role_permission` (`role_id`, `permission_id`)
+                                       UNIQUE KEY `uk_role_permission_deleted` (`role_id`, `permission_id`, `deleted`)
 ) COMMENT='角色-权限关联表';
 
 DROP TABLE IF EXISTS `sys_team`;
@@ -71,7 +75,7 @@ CREATE TABLE `sys_team` (
                                  `storage_quota` bigint DEFAULT 1024,
                                  `create_time` datetime DEFAULT NULL,
                                  `update_time` datetime DEFAULT NULL,
-                                 `deleted` tinyint DEFAULT 0,
+                                 `deleted` bigint DEFAULT 0 COMMENT '删除标记（0-未删除，删除时设置为当前记录的id值）',
                                  PRIMARY KEY (`id`)
 ) COMMENT='团队表';
 
@@ -83,7 +87,7 @@ CREATE TABLE `sys_user_team` (
                                       `role_id` int NOT NULL,
                                       `create_time` datetime DEFAULT NULL,
                                       `update_time` datetime DEFAULT NULL,
-                                      `deleted` tinyint DEFAULT 0,
+                                      `deleted` bigint DEFAULT 0 COMMENT '删除标记（0-未删除，删除时设置为当前记录的id值）',
                                       PRIMARY KEY (`id`),
-                                      UNIQUE KEY `uk_user_team` (`user_id`, `team_id`)
+                                      UNIQUE KEY `uk_user_team_deleted` (`user_id`, `team_id`, `deleted`)
 ) COMMENT='用户-团队关联表';

@@ -28,9 +28,11 @@ public abstract class BaseEntity {
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+    
     /**
-     * 删除标记（0-未删除，1-已删除）
+     * 删除标记（0-未删除，删除时设置为当前记录的id值）
+     * 配合联合唯一索引使用，避免逻辑删除后的记录与新增记录产生唯一索引冲突
      */
-    @TableLogic
-    private Integer deleted;
+    @TableLogic(value = "0", delval = "id")
+    private Long deleted;
 }
