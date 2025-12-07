@@ -23,6 +23,8 @@
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <hutool.version>5.8.26</hutool.version>
         <lombok.version>1.18.30</lombok.version>
+        <knife4j.version>4.4.0</knife4j.version>
+        <swagger-annotations.version>2.2.19</swagger-annotations.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>17</maven.compiler.source>
@@ -107,6 +109,20 @@
                 <groupId>com.nexus</groupId>
                 <artifactId>nexus-module-rag</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            
+            <!-- Knife4j -->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
+            </dependency>
+            
+            <!-- Swagger Annotations -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger-annotations.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
