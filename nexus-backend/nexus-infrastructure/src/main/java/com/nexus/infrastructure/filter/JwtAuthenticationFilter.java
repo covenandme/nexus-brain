@@ -56,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     new UsernamePasswordAuthenticationToken(
                         username,
                         null,
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))//TODO: 用户对应多个角色
                     );
                 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
