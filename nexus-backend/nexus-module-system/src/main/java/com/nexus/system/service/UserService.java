@@ -6,8 +6,6 @@ import com.nexus.system.dto.UserDto;
 import com.nexus.system.dto.UserRegisterDTO;
 import com.nexus.system.entity.User;
 
-import java.util.List;
-
 /**
  * 用户服务接口
  */

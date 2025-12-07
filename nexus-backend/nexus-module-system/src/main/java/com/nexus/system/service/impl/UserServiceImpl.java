@@ -144,18 +144,51 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean removeById(java.io.Serializable id) {
-
         if (id == null) {
             throw new BusinessException(ResultCode.VALIDATE_FAILED, "用户ID不能为空");
         }
 
+        Long userId = Long.valueOf(id.toString());
+        
         // 检查用户是否存在
-        User user = this.getById(id);
+        User user = this.getById(userId);
         if (user == null) {
             throw new BusinessException(ResultCode.NOTFOUND, "用户不存在");
         }
 
-        return super.removeById(id);
+        // 步骤1: 删除用户的所有私有团队（个人空间）
+        LambdaQueryWrapper<Team> teamWrapper = new LambdaQueryWrapper<>();
+        teamWrapper.eq(Team::getOwnerId, userId);
+        teamWrapper.eq(Team::getType, TEAM_TYPE_PRIVATE);
+        teamWrapper.eq(Team::getDeleted, 0);
+        java.util.List<Team> privateTeams = teamService.list(teamWrapper);
+
+        for (Team team : privateTeams) {
+            // 删除该团队的所有成员关联
+            LambdaQueryWrapper<TeamMember> memberWrapper = new LambdaQueryWrapper<>();
+            memberWrapper.eq(TeamMember::getTeamId, team.getId());
+            memberWrapper.eq(TeamMember::getDeleted, 0);
+            teamMemberService.remove(memberWrapper);
+
+            // 删除团队本身
+            teamService.removeById(team.getId());
+        }
+
+        // 步骤2: 删除用户的所有团队关联（包括在其他团队中的成员关系）
+        LambdaQueryWrapper<TeamMember> userTeamWrapper = new LambdaQueryWrapper<>();
+        userTeamWrapper.eq(TeamMember::getUserId, userId);
+        userTeamWrapper.eq(TeamMember::getDeleted, 0);
+        teamMemberService.remove(userTeamWrapper);
+
+        // 步骤3: 删除用户的所有角色关联
+        LambdaQueryWrapper<UserRole> userRoleWrapper = new LambdaQueryWrapper<>();
+        userRoleWrapper.eq(UserRole::getUserId, userId);
+        userRoleWrapper.eq(UserRole::getDeleted, 0);
+        userRoleService.remove(userRoleWrapper);
+
+        // 步骤4: 最后删除用户本身
+        return super.removeById(userId);
     }
 }
