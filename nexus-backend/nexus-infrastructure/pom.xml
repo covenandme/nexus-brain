@@ -70,5 +70,9 @@
             <groupId>com.nexus</groupId>
             <artifactId>nexus-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-module-system</artifactId>
+        </dependency>
     </dependencies>
 </project>

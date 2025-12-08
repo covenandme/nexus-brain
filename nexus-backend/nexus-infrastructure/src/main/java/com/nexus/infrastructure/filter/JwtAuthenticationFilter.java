@@ -1,30 +1,33 @@
 package com.nexus.infrastructure.filter;
 
+import com.nexus.common.security.DomainUserDetailsService;
+import com.nexus.common.security.LoginUser;
 import com.nexus.common.util.JwtUtil;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
 
 /**
  * JWT认证过滤器
  * 拦截请求头中的Authorization，验证Token并设置SecurityContext
  */
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
+    
+    private final DomainUserDetailsService userDetailsService;
     
     @Override
     protected void doFilterInternal(HttpServletRequest request, 
@@ -45,18 +48,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             // 验证Token
             if (JwtUtil.validateToken(token)) {
-                // 解析Token获取Claims
-                Claims claims = JwtUtil.parseToken(token);
+                // 解析Token获取userId
                 Long userId = JwtUtil.getUserIdFromToken(token);
-                String username = JwtUtil.getUsernameFromToken(token);
                 
-                // 创建认证对象
-                // 这里暂时使用简单的角色，后续可以根据实际需求从数据库查询用户角色
+                // 从数据库加载用户详情（包含角色信息）
+                LoginUser loginUser = userDetailsService.loadUserById(userId);
+                
+                // 创建认证对象，使用userId作为principal
                 UsernamePasswordAuthenticationToken authentication = 
                     new UsernamePasswordAuthenticationToken(
-                        username,
+                        userId,  // 使用userId作为principal
                         null,
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))//TODO: 用户对应多个角色
+                        loginUser.getAuthorities()  // 使用从数据库加载的真实角色
                     );
                 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
