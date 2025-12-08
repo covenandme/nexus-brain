@@ -2,6 +2,8 @@ package com.nexus.system.controller;
 
 import com.nexus.common.result.PageResult;
 import com.nexus.common.result.Result;
+import com.nexus.common.security.LoginUser;
+import com.nexus.infrastructure.security.CurrentUser;
 import com.nexus.system.dto.UserDto;
 import com.nexus.system.dto.UserLoginDTO;
 import com.nexus.system.dto.UserRegisterDTO;
@@ -12,7 +14,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -44,6 +45,16 @@ public class UserController {
     public Result<Boolean> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
         boolean result = userService.register(userRegisterDTO);
         return Result.success(result);
+    }
+
+    /**
+     * 获取当前登录用户信息
+     */
+    @Operation(summary = "获取当前登录用户信息", description = "获取当前登录用户的详细信息")
+    @GetMapping("/me")
+    public Result<UserDto> getCurrentUser(@CurrentUser LoginUser loginUser) {
+        UserDto userDto = userService.getCurrentUser(loginUser.getUserId());
+        return Result.success(userDto);
     }
 
     /**

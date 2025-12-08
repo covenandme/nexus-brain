@@ -19,7 +19,10 @@
             <groupId>com.nexus</groupId>
             <artifactId>nexus-common</artifactId>
         </dependency>
-        
+        <dependency>
+            <groupId>com.nexus</groupId>
+            <artifactId>nexus-infrastructure</artifactId>
+        </dependency>
         <!-- Spring Boot Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

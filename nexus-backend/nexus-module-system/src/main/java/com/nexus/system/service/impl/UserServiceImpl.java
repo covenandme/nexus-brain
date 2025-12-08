@@ -175,6 +175,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    public UserDto getCurrentUser(Long userId) {
+        if (userId == null) {
+            throw new BusinessException(ResultCode.UNAUTHORIZED, "未登录或登录已过期");
+        }
+        User user = super.getById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.NOTFOUND, "用户不存在");
+        }
+        UserDto userDto = new UserDto();
+        BeanUtils.copyProperties(user, userDto);
+        return userDto;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean removeById(java.io.Serializable id) {
         if (id == null) {

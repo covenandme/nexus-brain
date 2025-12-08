@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.nexus.common.result.PageResult;
 import com.nexus.common.result.Result;
+import com.nexus.common.security.LoginUser;
+import com.nexus.infrastructure.security.CurrentUser;
 import com.nexus.system.entity.Team;
 import com.nexus.system.service.TeamService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +24,21 @@ public class TeamController {
 
     @Autowired
     private TeamService teamService;
+
+    /**
+     * 获取当前用户的所有团队
+     */
+    @Operation(summary = "获取我的团队", description = "分页查询当前登录用户加入的所有团队")
+    @GetMapping("/me")
+    public Result<PageResult<Team>> getMyTeams(
+            @CurrentUser LoginUser loginUser,
+            @Parameter(description = "页码，默认1", example = "1")
+            @RequestParam(defaultValue = "1") int pageNum,
+            @Parameter(description = "每页大小，默认10", example = "10")
+            @RequestParam(defaultValue = "10") int pageSize) {
+        PageResult<Team> teams = teamService.getMyTeams(loginUser.getUserId(), pageNum, pageSize);
+        return Result.success(teams);
+    }
 
     /**
      * 根据ID获取团队信息
