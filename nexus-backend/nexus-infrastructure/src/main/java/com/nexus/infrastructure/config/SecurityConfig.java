@@ -1,11 +1,14 @@
 package com.nexus.infrastructure.config;
 
+import com.nexus.common.security.DomainUserDetailsService;
 import com.nexus.infrastructure.filter.JwtAuthenticationFilter;
 import com.nexus.infrastructure.security.JwtAuthenticationEntryPoint;
 import com.nexus.infrastructure.security.JwtAccessDeniedHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,19 +26,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
     
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                         JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-                         JwtAccessDeniedHandler jwtAccessDeniedHandler) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
-    }
+    private final DomainUserDetailsService userDetailsService;
     
     /**
      * 配置SecurityFilterChain
@@ -94,5 +91,17 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+    
+    /**
+     * 配置DaoAuthenticationProvider
+     * 使用自定义的UserDetailsService和PasswordEncoder
+     */
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
 }

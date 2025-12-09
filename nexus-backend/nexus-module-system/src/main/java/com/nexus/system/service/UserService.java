@@ -29,5 +29,12 @@ public interface UserService extends IService<User> {
     
     UserDto getUserById(Long id);
     PageResult<UserDto> getAllUsers(int pageNum, int pageSize);
+    
+    /**
+     * 获取当前登录用户信息
+     * @param userId 当前登录用户ID
+     * @return 用户信息DTO
+     */
+    UserDto getCurrentUser(Long userId);
 
 }

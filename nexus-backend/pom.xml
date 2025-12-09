@@ -26,6 +26,7 @@
         <knife4j.version>4.4.0</knife4j.version>
         <swagger-annotations.version>2.2.19</swagger-annotations.version>
         <jjwt.version>0.12.6</jjwt.version>
+        <jackson.version>2.15.4</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>17</maven.compiler.source>
@@ -141,6 +142,12 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-jackson</artifactId>
                 <version>${jjwt.version}</version>
+            </dependency>
+            <!-- Jackson 注解 -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
