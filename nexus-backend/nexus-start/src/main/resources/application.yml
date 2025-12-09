@@ -8,5 +8,24 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/nexus_brain
-    username: root
-    password: root
+    username: admin
+    password: admin
+
+  # RabbitMQ 配置
+  rabbitmq:
+    host: localhost             # RabbitMQ 服务器地址 (Docker 默认)
+    port: 5672                  # RabbitMQ 默认端口
+    username: admin             # 默认用户名
+    password: admin             # 默认密码
+    listener:
+      simple:
+        # 消费者手动确认模式，确保消息处理失败时可以重试
+        acknowledge-mode: manual
+
+nexus:
+  # MinIO 对象存储配置
+  minio:
+    endpoint: http://localhost:9000  # MinIO 服务器地址
+    access-key: admin           # 访问 Key (需与Docker启动时设置的一致)
+    secret-key: admin           # 密钥 Key
+    bucket-name: nexus-data          # 默认存储桶名称 (用于文件存储)
