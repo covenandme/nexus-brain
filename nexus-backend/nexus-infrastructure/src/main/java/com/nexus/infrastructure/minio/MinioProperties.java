@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
  * MinIO 配置属性类
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "nexus.minio")
 public class MinioProperties {
     
