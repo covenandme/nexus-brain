@@ -27,6 +27,7 @@
         <swagger-annotations.version>2.2.19</swagger-annotations.version>
         <jjwt.version>0.12.6</jjwt.version>
         <jackson.version>2.15.4</jackson.version>
+        <minio.version>8.5.1</minio.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>17</maven.compiler.source>
@@ -148,6 +149,12 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
