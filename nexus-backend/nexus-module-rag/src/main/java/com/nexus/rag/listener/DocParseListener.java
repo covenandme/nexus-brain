@@ -2,11 +2,14 @@ package com.nexus.rag.listener;
 
 import com.nexus.common.dto.mq.DocParseMsg;
 import com.nexus.infrastructure.config.MqConfig;
-import com.nexus.knowledge.entity.KnowledgeDocument;
-import com.nexus.knowledge.mapper.KnowledgeDocumentMapper;
+import com.nexus.rag.service.RagService;
+import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,75 +20,39 @@ import org.springframework.stereotype.Component;
 public class DocParseListener {
     
     @Autowired
-    private KnowledgeDocumentMapper documentMapper;
+    private RagService ragService;
     
     /**
-     * 监听文档解析队列
+     * 监听文档解析队列（手动 ACK 模式）
      * 
      * @param msg 文档解析消息
+     * @param channel RabbitMQ 通道
+     * @param deliveryTag 消息投递标签
      */
     @RabbitListener(queues = MqConfig.QUEUE_DOC_PARSE)
-    public void handle(DocParseMsg msg) {
+    public void handle(DocParseMsg msg, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) {
         log.info("收到解析任务: {}", msg);
         
-        Long docId = msg.getDocId();
-        
         try {
-            // Step 1: 更新数据库，将状态改为解析中
-            KnowledgeDocument document = documentMapper.selectById(docId);
-            if (document == null) {
-                log.error("文档不存在: docId={}", docId);
-                return;
-            }
+            // 调用 RagService 进行文档解析和向量化
+            ragService.parseAndStore(msg.getDocId());
             
-            document.setStatus(KnowledgeDocument.STATUS_PARSING);
-            documentMapper.updateById(document);
-            log.info("文档状态已更新为解析中: docId={}", docId);
-            
-            // Step 2: 模拟 AI 解析耗时
-            Thread.sleep(3000);
-            log.info("AI 解析完成（模拟）: docId={}", docId);
-            
-            // Step 3: 更新数据库，将状态改为成功，已向量化
-            document.setStatus(KnowledgeDocument.STATUS_COMPLETED);
-            document.setVectorStatus(KnowledgeDocument.VECTOR_STATUS_COMPLETED);
-            documentMapper.updateById(document);
-            
-            log.info("解析完成: docId={}, status={}, vectorStatus={}", 
-                    docId, document.getStatus(), document.getVectorStatus());
-            
-        } catch (InterruptedException e) {
-            log.error("解析任务被中断: docId={}", docId, e);
-            Thread.currentThread().interrupt();
-            
-            // 更新为失败状态
-            updateToFailedStatus(docId, "解析任务被中断");
+            // 手动确认消息（告诉 MQ 消息已成功处理，可以删除）
+            channel.basicAck(deliveryTag, false);
+            log.info("消息确认成功: docId={}, deliveryTag={}", msg.getDocId(), deliveryTag);
             
         } catch (Exception e) {
-            log.error("解析任务失败: docId={}", docId, e);
+            log.error("解析任务失败: docId={}, deliveryTag={}", msg.getDocId(), deliveryTag, e);
             
-            // 更新为失败状态
-            updateToFailedStatus(docId, e.getMessage());
-        }
-    }
-    
-    /**
-     * 更新文档为失败状态
-     * 
-     * @param docId 文档ID
-     * @param errorMsg 错误信息
-     */
-    private void updateToFailedStatus(Long docId, String errorMsg) {
-        try {
-            KnowledgeDocument document = documentMapper.selectById(docId);
-            if (document != null) {
-                document.setStatus(KnowledgeDocument.STATUS_FAILED);
-                document.setParseErrorMsg(errorMsg);
-                documentMapper.updateById(document);
-                log.info("文档状态已更新为失败: docId={}, errorMsg={}", docId, errorMsg);
+            try {
+                // 拒绝消息并丢弃（不重新入队）
+                // 参数说明：deliveryTag, multiple=false, requeue=false
+                // requeue=false 表示不重新入队，避免无限重试导致队列阻塞
+                channel.basicNack(deliveryTag, false, false);
+                log.warn("消息已拒绝并丢弃: docId={}, deliveryTag={}", msg.getDocId(), deliveryTag);
+            } catch (Exception nackException) {
+                log.error("拒绝消息时发生异常: docId={}", msg.getDocId(), nackException);
             }
-        } catch (Exception e) {
-            log.error("更新文档失败状态时出错: docId={}", docId, e);
         }
     }
 }

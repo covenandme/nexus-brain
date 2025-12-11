@@ -1,9 +1,9 @@
 package com.nexus.infrastructure.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +37,25 @@ public class MqConfig {
     public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }
-    
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
+            ConnectionFactory connectionFactory,
+            MessageConverter messageConverter) {
+
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(messageConverter); // 确保能解析 JSON
+
+        // 🚨 强制设置为手动签收模式！
+        // 只有加了这行，你的 DocParseListener 里的 channel.basicAck 才会生效且不报错
+        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+
+        // 可选：设置并发数（同时处理多少个文件）
+        factory.setConcurrentConsumers(1);
+        factory.setMaxConcurrentConsumers(5);
+
+        return factory;
+    }
     /**
      * 定义知识库交换机（持久化）
      */
